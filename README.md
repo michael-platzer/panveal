@@ -2,8 +2,10 @@
 Presentations with [Pandoc](https://pandoc.org/)
 and [reveal.js](https://revealjs.com/)
 
-* Copy the files `Makefile` and `template.htm`
-  to the directory where you wish to create your presentation.
+* The slides of your presentation can be either in HTML format,
+  in Markdown syntax or can be SVG files.
+  Markdown files are converted into HTML with Pandoc
+  and for SVG images a slide with a reference to the SVG is added.
 
 * Each slide of your presentation must be stored in an individual file.
   All files which are covered by the wildcard pattern `slide_*`
@@ -27,8 +29,13 @@ and [reveal.js](https://revealjs.com/)
   More specifically, all slides for which the part
   described by the regular expression `slide_[0-9]*` is identical are grouped.
 
-* Use the command `make` to generate your presentation.
-  You might want to specify a title:
+* Use the command `make` to generate your presentation
+  and use the option `-f` to point to the `Makefile` in this repository.
   ```
-  make TITLE="My Presentation"
+  make -f /path/to/panveal/Makefile
+  ```
+
+* You might also want to specify a title for your presentation:
+  ```
+  make -f /path/to/panveal/Makefile TITLE="My Presentation"
   ```

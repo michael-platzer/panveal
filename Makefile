@@ -1,19 +1,19 @@
-SHELL = /bin/bash
+SHELL := /bin/bash
 
-REVEAL_JS = reveal.js
-REVEAL_CSS = reveal.css
-REVEAL_THEMES = theme/white.css
+MKFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+TEMPLATE := $(MKFILE_DIR)/template.htm
 
-TEMPLATE = template.htm
+REVEAL_JS := reveal.js
+REVEAL_CSS := reveal.css
+REVEAL_THEMES := theme/white.css
 
 PRES = pres.htm
 
-SLIDES_SRC = $(sort $(wildcard slide_*))
-SLIDES_TMP = $(SLIDES_SRC:%.md=.%.md.htm)
-SLIDES = $(SLIDES_TMP:%.svg=.%.svg.htm)
+SLIDES := $(sort $(wildcard slide_*))
+SLIDES := $(SLIDES:%.md=.%.md.htm)
+SLIDES := $(SLIDES:%.svg=.%.svg.htm)
 
-all: $(PRES) $(REVEAL_JS) $(REVEAL_CSS) $(REVEAL_THEMES)
-	@echo $(SLIDES)
+all: $(REVEAL_JS) $(REVEAL_CSS) $(REVEAL_THEMES) $(PRES)
 
 $(REVEAL_JS):
 	wget -nv https://github.com/hakimel/reveal.js/raw/master/js/reveal.js
