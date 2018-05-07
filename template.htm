@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>$(TITLE)</title>
+    <link rel="stylesheet" href="reveal.css">
+    <link rel="stylesheet" href="theme/white.css">
+  </head>
+  <body>
+    <script>
+        // list of slides which animate themselves (= self-anims):
+        var selfanims = [];
+
+        // number of self-anims which are still loading (null if there are no
+        // self-anims, 0 if all of them have been loaded):
+        var loading_selfanims = null;
+    </script>
+
+    <div class="reveal">
+      <div class="slides">
+      </div>
+    </div>
+
+    <script src="$(REVEAL_JS)"></script>
+
+    <script>
+        /**
+         * Initialize Reveal and set up a fragment event listeners.
+         */
+        function initReveal() {
+            Reveal.initialize();
+
+            Reveal.addEventListener("fragmentshown", function(event) {
+                var frag = event.fragment;
+                var frag_parent = frag.parentElement;
+                var idx = parseInt(frag.getAttribute("data-fragment-index"));
+
+                for (var i = 0; i < selfanims.length; i++)
+                    if (selfanims[i].sect == frag_parent)
+                        selfanims[i].next(idx);
+            });
+            Reveal.addEventListener("fragmenthidden", function(event) {
+                var frag = event.fragment;
+                var frag_parent = frag.parentElement;
+                var idx = parseInt(frag.getAttribute("data-fragment-index"));
+
+                for (var i = 0; i < selfanims.length; i++)
+                    if (selfanims[i].sect == frag_parent)
+                        selfanims[i].prev(idx);
+            });
+        }
+
+        // if there are no self-anims, we immediatly initialize Reveal:
+        if (loading_selfanims == null)
+            initReveal();
+
+        /**
+         * Add an SVG slide to the self-anims.
+         */
+        function addSVGslide(svg_obj) {
+            var slide = svg_obj.parentElement;
+
+            // get all groups (<g> tags) of the SVG file:
+            var groups = svg_obj.contentDocument.getElementsByTagName("g");
+
+            // list of layers, with the offset, end and id for each layer:
+            var layers = [];
+            // maximum animation step index (number of animation steps - 1):
+            var max_idx = 0;
+
+            for (var i = 0; i < groups.length; i++)
+                if (groups[i].getAttribute("inkscape:groupmode") == "layer") {
+                    var subs = groups[i].getAttribute("inkscape:label").split("-");
+                    var off, end;
+                    if (subs.length == 1)
+                        off = end = parseInt(subs[0]);
+                    else {
+                        off = (subs[0] == '') ? 0 : parseInt(subs[0]);
+                        end = (subs[1] == '') ? -1 : parseInt(subs[1]);
+                    }
+                    if (end > max_idx)
+                        max_idx = end;
+                    layers.push([ off, end, groups[i].id ]);
+
+                    // set each layer to its initial state:
+                    groups[i].style.display = (off > 0) ? "none" : "inline";
+                }
+
+            // list of transitions, with the layers to show at each step:
+            var layers_show = [];
+            // list of transitions, with the layers to hide at each step:
+            var layers_hide = [];
+
+            // initialize the transition lists; there is one less transition
+            // than the number of animation steps
+            for (var i = 0; i < max_idx; i++) {
+                layers_show[i] = [];
+                layers_hide[i] = [];
+            }
+
+            for (var i = 0; i < layers.length; i++) {
+                var off = layers[i][0];
+                var end = layers[i][1];
+                var id = layers[i][2];
+                if (off > 0)
+                    layers_show[off - 1].push(id);
+                if (0 <= end && end < max_idx)
+                    layers_hide[end].push(id);
+            }
+
+            // add a fragment for each animation transition:
+            for (var i = 0; i < max_idx; i++) {
+                var frag = document.createElement("div");
+                frag.setAttribute("class", "fragment");
+                frag.style.display = "none";
+                slide.appendChild(frag);
+            }
+            selfanims.push({
+                sect: slide,
+                elems_show: layers_show,
+                elems_hide: layers_hide,
+                next: function(idx) {
+                    var svg_obj = this.sect.getElementsByTagName("object")[0];
+                    var svg_dom = svg_obj.contentDocument;
+                    for (var i = 0; i < this.elems_show[idx].length; i++)
+                        svg_dom.getElementById(this.elems_show[idx][i]).style.display = "inline";
+                    for (var i = 0; i < this.elems_hide[idx].length; i++)
+                        svg_dom.getElementById(this.elems_hide[idx][i]).style.display = "none";
+                },
+                prev: function(idx) {
+                    var svg_obj = this.sect.getElementsByTagName("object")[0];
+                    var svg_dom = svg_obj.contentDocument;
+                    for (var i = 0; i < this.elems_show[idx].length; i++)
+                        svg_dom.getElementById(this.elems_show[idx][i]).style.display = "none";
+                    for (var i = 0; i < this.elems_hide[idx].length; i++)
+                        svg_dom.getElementById(this.elems_hide[idx][i]).style.display = "inline";
+                }
+            });
+            loading_selfanims--;
+            if (loading_selfanims == 0)
+                initReveal();
+        }
+    </script>
+
+  </body>
+</html>
