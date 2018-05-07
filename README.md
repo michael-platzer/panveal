@@ -24,6 +24,8 @@ and [reveal.js](https://revealjs.com/)
   slide_01 slide_02a slide_02b slide_03 ...
   ```
   where `slide_02a` and `slide_02b` are grouped and placed vertically.
+  More specifically, all slides for which the part
+  described by the regular expression `slide_[0-9]*` is identical are grouped.
 
 * Use the command `make` to generate your presentation.
   You might want to specify a title:
