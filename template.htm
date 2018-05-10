@@ -63,13 +63,8 @@
             // get all groups (<g> tags) of the SVG file:
             var groups = svg_obj.contentDocument.getElementsByTagName("g");
 
-            // list of layers, with the offset, end and id for each layer:
-            //var layers = [];
-            // maximum animation step index (number of animation steps - 1):
-            //var max_idx = -1;
             // number of animation steps:
             var steps = 0;
-
             // list of transitions, with the layers to show at each step:
             var layers_show = [];
             // list of transitions, with the layers to hide at each step:
@@ -91,7 +86,6 @@
                             layers_hide[steps] = [];
                         }
                     }
-                    //layers.push([ off, end, groups[i].id ]);
 
                     if (off > 0)
                         layers_show[off - 1].push(groups[i].id);
