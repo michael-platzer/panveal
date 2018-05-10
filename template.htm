@@ -64,9 +64,14 @@
             var groups = svg_obj.contentDocument.getElementsByTagName("g");
 
             // list of layers, with the offset, end and id for each layer:
-            var layers = [];
+            //var layers = [];
             // maximum animation step index (number of animation steps - 1):
-            var max_idx = 0;
+            var max_idx = -1;
+
+            // list of transitions, with the layers to show at each step:
+            var layers_show = [];
+            // list of transitions, with the layers to hide at each step:
+            var layers_hide = [];
 
             for (var i = 0; i < groups.length; i++)
                 if (groups[i].getAttribute("inkscape:groupmode") == "layer") {
@@ -78,35 +83,24 @@
                         off = (subs[0] == '') ? 0 : parseInt(subs[0]);
                         end = (subs[1] == '') ? -1 : parseInt(subs[1]);
                     }
-                    if (end > max_idx)
+                    if (end > max_idx) {
+                        for (var j = max_idx + 1; j <= end; j++) {
+                            layers_show[j] = [];
+                            layers_hide[j] = [];
+                        }
                         max_idx = end;
-                    layers.push([ off, end, groups[i].id ]);
+                    }
+                    //layers.push([ off, end, groups[i].id ]);
+
+                    if (off > 0)
+                        layers_show[off - 1].push(groups[i].id);
+                    //if (0 <= end && end < max_idx)
+                    if (0 <= end)
+                        layers_hide[end].push(groups[i].id);
 
                     // set each layer to its initial state:
                     groups[i].style.display = (off > 0) ? "none" : "inline";
                 }
-
-            // list of transitions, with the layers to show at each step:
-            var layers_show = [];
-            // list of transitions, with the layers to hide at each step:
-            var layers_hide = [];
-
-            // initialize the transition lists; there is one less transition
-            // than the number of animation steps
-            for (var i = 0; i < max_idx; i++) {
-                layers_show[i] = [];
-                layers_hide[i] = [];
-            }
-
-            for (var i = 0; i < layers.length; i++) {
-                var off = layers[i][0];
-                var end = layers[i][1];
-                var id = layers[i][2];
-                if (off > 0)
-                    layers_show[off - 1].push(id);
-                if (0 <= end && end < max_idx)
-                    layers_hide[end].push(id);
-            }
 
             // add a fragment for each animation transition:
             for (var i = 0; i < max_idx; i++) {

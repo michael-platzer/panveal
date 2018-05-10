@@ -50,12 +50,17 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	     act=$$next;                                                          \
 	     num=$$nextnum;                                                       \
 	 done;                                                                    \
+	 if [ "$$act" == "" ]; then                                               \
+	     echo 'Your presentation contains no slides!';                        \
+	     exit 0;                                                              \
+	 fi;                                                                      \
 	 if [ "$$level" == "1" ]; then                                            \
 	     sed 's/^/          /' < $$act >> $@;                                 \
 	     echo '        </section>' >> $@;                                     \
 	 else                                                                     \
 	     sed 's/^/        /' < $$act >> $@;                                   \
-	 fi;
+	 fi;                                                                      \
+	 exit 0;
 
 	 @sed -e '1,/.*<div class="slides">.*/d' -e 's/\$$(REVEAL_JS)/$(REVEAL_JS)/' < $< >> $@
 
