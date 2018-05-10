@@ -72,29 +72,38 @@
 
             for (var i = 0; i < groups.length; i++)
                 if (groups[i].getAttribute("inkscape:groupmode") == "layer") {
-                    var subs = groups[i].getAttribute("inkscape:label").split("-");
-                    var off, end;
-                    if (subs.length == 1)
-                        off = end = parseInt(subs[0]);
-                    else {
-                        off = (subs[0] == '') ? 0 : parseInt(subs[0]);
-                        end = (subs[1] == '') ? -1 : parseInt(subs[1]);
-                    }
-                    if (off >= steps || end >= steps) {
-                        for (; steps <= off || steps <= end; steps++) {
-                            layers_show[steps] = [];
-                            layers_hide[steps] = [];
-                        }
-                    }
+                    var onlystr = groups[i].getAttribute("inkscape:label").split(",");
+                    var show_at_start = false;
 
-                    if (off > 0)
-                        layers_show[off - 1].push(groups[i].id);
-                    //if (0 <= end && end < max_idx)
-                    if (0 <= end)
-                        layers_hide[end].push(groups[i].id);
+                    for (var j = 0; j < onlystr.length; j++) {
+                        var subs = onlystr[j].split("-");
+                        var off, end;
+                        if (subs.length == 1)
+                            off = end = parseInt(subs[0]);
+                        else {
+                            off = (subs[0] == '') ? 0 : parseInt(subs[0]);
+                            end = (subs[1] == '') ? -1 : parseInt(subs[1]);
+                        }
+                        if (off >= steps || end >= steps) {
+                            for (; steps <= off || steps <= end; steps++) {
+                                layers_show[steps] = [];
+                                layers_hide[steps] = [];
+                            }
+                        }
+
+                        if (off > 0)
+                            layers_show[off - 1].push(groups[i].id);
+                        //if (0 <= end && end < max_idx)
+                        if (0 <= end)
+                            layers_hide[end].push(groups[i].id);
+
+                        // groups[i].style.display = (off > 0) ? "none" : "inline";
+                        if (off == 0)
+                            show_at_start = true;
+                    }
 
                     // set each layer to its initial state:
-                    groups[i].style.display = (off > 0) ? "none" : "inline";
+                    groups[i].style.display = show_at_start ? "inline" : "none";
                 }
 
             // add a fragment for each animation transition:
