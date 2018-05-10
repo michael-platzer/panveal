@@ -66,7 +66,9 @@
             // list of layers, with the offset, end and id for each layer:
             //var layers = [];
             // maximum animation step index (number of animation steps - 1):
-            var max_idx = -1;
+            //var max_idx = -1;
+            // number of animation steps:
+            var steps = 0;
 
             // list of transitions, with the layers to show at each step:
             var layers_show = [];
@@ -83,12 +85,11 @@
                         off = (subs[0] == '') ? 0 : parseInt(subs[0]);
                         end = (subs[1] == '') ? -1 : parseInt(subs[1]);
                     }
-                    if (end > max_idx) {
-                        for (var j = max_idx + 1; j <= end; j++) {
-                            layers_show[j] = [];
-                            layers_hide[j] = [];
+                    if (off >= steps || end >= steps) {
+                        for (; steps <= off || steps <= end; steps++) {
+                            layers_show[steps] = [];
+                            layers_hide[steps] = [];
                         }
-                        max_idx = end;
                     }
                     //layers.push([ off, end, groups[i].id ]);
 
@@ -103,7 +104,8 @@
                 }
 
             // add a fragment for each animation transition:
-            for (var i = 0; i < max_idx; i++) {
+            // (there is one less transition than the number of steps)
+            for (var i = 0; i < steps - 1; i++) {
                 var frag = document.createElement("div");
                 frag.setAttribute("class", "fragment");
                 frag.style.display = "none";
