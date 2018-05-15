@@ -74,7 +74,7 @@ More specifically, all slides for which the part
 described by the regular expression `slide_[0-9]*` is identical are grouped.
 
 Grouped slides are placed vertically by reveal.js,
-whereas non-grouped slides are organized vertically.
+whereas non-grouped slides are organized horizontally.
 
 ### Markdown
 
@@ -84,7 +84,7 @@ Therefore, you may use any of
 
 Some interesting extensions are:
 
-* *Tex Math:* Anything between between two `$` characters
+* **Tex Math:** Anything between between two `$` characters
   will be [treated as TeX math](https://pandoc.org/MANUAL.html#math).
 
 * [Pandoc supports adding images](https://pandoc.org/MANUAL.html#images)
@@ -106,5 +106,5 @@ You can animate your SVG by creating multiple layers.
 Use a layer's name to specify in which animation steps it shall appear.
 For instance, if a layer shall be shown from steps 1 to 3,
 simply name it `1-3`.
-The syntax of this specification is similar
-to the Latex beamer overlay specifications.
+The syntax of this specification is similar to the [Latex beamer overlay
+specifications](https://www.sharelatex.com/blog/2013/08/20/beamer-series-pt4.html#overlays-and-text-formatting).
