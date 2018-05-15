@@ -9,6 +9,11 @@ and [reveal.js](https://revealjs.com/)
   and the
   [template file](https://github.com/michael-platzer/panveal/raw/master/template.htm).
 
+* Make sure that [Pandoc](https://pandoc.org/) is installed.
+  When building your presentation,
+  the required files from [reveal.js](https://revealjs.com/)
+  are automatically downloaded to the directory of your presentation.
+
 * The slides of your presentation can be in any of the following formats:
   HTML, Markdown or SVG&ast;
   (formats with an asterisk are only linked to,
@@ -37,21 +42,63 @@ and [reveal.js](https://revealjs.com/)
   make -f /path/to/panveal/Makefile
   ```
 
-Markdown files are converted to HTML with Pandoc
-and for SVG images a slide with a reference to the SVG is added.
+## Features
 
+### Makefile Variables
+
+Following variables can be passed to the Makefile from the command line:
+
+* Specify a title for your presentation:
+  ```
+  make TITLE="My Presentation"
+  ```
+  Defaults to `Panveal Presentation`.
+
+* Specify a filename for your presentation:
+  ```
+  make PRES="my_pres.htm"
+  ```
+  Defaults to `pres.htm`.
+
+* Use an alternative template file:
+  ```
+  make TEMPLATE="/path/to/my_template.htm"
+  ```
+  Defaults to the file `template.htm` in the same directory as the `Makefile`.
+
+### Grouping
+
+As already mentioned in the introduction,
+slides with an identical number are grouped.
 More specifically, all slides for which the part
 described by the regular expression `slide_[0-9]*` is identical are grouped.
-Grouped slides are placed vertically by reveal.js.
 
-## Advanced functionality
+Grouped slides are placed vertically by reveal.js,
+whereas non-grouped slides are organized vertically.
 
-### Specifying a title for your presentation
+### Markdown
 
-Specify a title for your presentation:
-```
-make TITLE="My Presentation"
-```
+Markdown files are converted to HTML with Pandoc.
+Therefore, you may use any of
+[Pandoc's Markdown extensions](https://pandoc.org/MANUAL.html#pandocs-markdown).
+
+Some interesting extensions are:
+
+* *Tex Math:* Anything between between two `$` characters
+  will be [treated as TeX math](https://pandoc.org/MANUAL.html#math).
+
+* [Pandoc supports adding images](https://pandoc.org/MANUAL.html#images)
+  by prepending a `!` to a link:
+
+  ```
+  ![caption](/url/of/image.png)
+  ```
+
+  Pandoc also allows to
+  [set HTML attributes for images](https://pandoc.org/MANUAL.html#extension-link_attributes),
+  for instance to specify the width and height for an image.
+
+As usual, raw HTML can be used within Markdown.
 
 ### Animating SVG slides
 
