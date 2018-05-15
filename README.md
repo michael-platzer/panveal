@@ -84,6 +84,10 @@ Therefore, you may use any of
 
 Some interesting extensions are:
 
+* Add pauses (equivalent to the LaTeX Beamer `\pause` macro)
+  by [inserting a paragraph with 3 dots](https://pandoc.org/MANUAL.html#inserting-pauses)
+  (separated by spaces).
+
 * **Tex Math:** Anything between between two `$` characters
   will be [treated as TeX math](https://pandoc.org/MANUAL.html#math).
 
