@@ -78,7 +78,7 @@ whereas non-grouped slides are organized horizontally.
 
 ## Input Formats
 
-### HMTL
+### HTML
 
 The content of a file with the extension `.htm` or `.html`
 is inserted into the presentation without any modifications.
@@ -121,7 +121,9 @@ Slides in the [SVG format](https://en.wikipedia.org/wiki/Scalable_Vector_Graphic
 (with the extension `.svg`)
 are inserted into your presentation as a full-screen vector graphics image.
 Note that the content of the SVG file is not embedded into the presentation,
-but instead a reference to the SVG is included.
+but instead the SVG is referenced.
+Therefore, changes to the SVG will take effect in the presentation
+without a rebuild.
 
 You can animate your SVG by creating multiple layers.
 Use a layer's name to specify in which animation steps it shall appear.
