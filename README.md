@@ -15,9 +15,9 @@ and [reveal.js](https://revealjs.com/)
   are automatically downloaded to the directory of your presentation.
 
 * The slides of your presentation can be in any of the following formats:
-  HTML, Markdown or SVG&ast;
-  (formats with an asterisk are only linked to,
-  but not embedded in the presentation).
+  HTML, Markdown, SVG or PDF
+  (read more about file conversion and other details
+  in the section [Input Formats](#input-formats)).
 
 * Each slide of your presentation must be stored in an individual file.
   All files which are covered by the wildcard pattern `slide_*`
@@ -76,9 +76,20 @@ described by the regular expression `slide_[0-9]*` is identical are grouped.
 Grouped slides are placed vertically by reveal.js,
 whereas non-grouped slides are organized horizontally.
 
+## Input Formats
+
+### HMTL
+
+The content of a file with the extension `.htm` or `.html`
+is inserted into the presentation without any modifications.
+Use this if you wish to hard-code any of your slides,
+taking advantage of all the features of
+[reveal.js](https://github.com/hakimel/reveal.js/).
+
 ### Markdown
 
-Markdown files are converted to HTML with Pandoc.
+Markdown files, with the extension `.md`,
+are converted to HTML with Pandoc.
 Therefore, you may use any of
 [Pandoc's Markdown extensions](https://pandoc.org/MANUAL.html#pandocs-markdown).
 
@@ -104,7 +115,13 @@ Some interesting extensions are:
 
 As usual, raw HTML can be used within Markdown.
 
-### Animating SVG slides
+### SVG
+
+Slides in the [SVG format](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics)
+(with the extension `.svg`)
+are inserted into your presentation as a full-screen vector graphics image.
+Note that the content of the SVG file is not embedded into the presentation,
+but instead a reference to the SVG is included.
 
 You can animate your SVG by creating multiple layers.
 Use a layer's name to specify in which animation steps it shall appear.
@@ -112,3 +129,16 @@ For instance, if a layer shall be shown from steps 1 to 3,
 simply name it `1-3`.
 The syntax of this specification is similar to the [Latex beamer overlay
 specifications](https://www.sharelatex.com/blog/2013/08/20/beamer-series-pt4.html#overlays-and-text-formatting).
+
+### PDF
+
+Slides can also be in PDF format.
+If the PDF contains multiple pages,
+these will be treated as individual animation steps and displayed successively.
+The entire PDF is still considered to be one slide only.
+
+A PDF file is converted into a SVG (or multiple SVG if the PDF has multiple pages)
+and a reference to the SVG is placed in the presentation.
+Note that the conversion to SVG requires
+[Poppler](https://poppler.freedesktop.org/) to be installed,
+however this should be the case on most Linux distributions.

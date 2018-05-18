@@ -36,10 +36,12 @@ REVEAL_FILES := $(PRES_DIR)/$(REVEAL_JS) $(PRES_DIR)/$(REVEAL_CSS)         \
 # All files covered by the wildcard pattern 'slide_*' are part of the
 # presentation:
 SLIDES := $(sort $(wildcard slide_*))
+SLIDES := $(filter %.htm %.html %.md %.svg %.pdf,$(SLIDES))
 
-# Convert *.md and *.svg files to temporary *.htm files:
+# Convert *.md, *.svg and *.pdf files to temporary *.htm files:
 SLIDES := $(SLIDES:%.md=.%.md.htm)
 SLIDES := $(SLIDES:%.svg=.%.svg.htm)
+SLIDES := $(SLIDES:%.pdf=.%.pdf.htm)
 
 ###############################################################################
 # Default target and cleanup rules:
@@ -47,7 +49,7 @@ SLIDES := $(SLIDES:%.svg=.%.svg.htm)
 all: $(REVEAL_FILES) $(PRES)
 
 clean:
-	rm -f $(PRES) .*.htm
+	rm -f $(PRES) .*.htm .*.svg
 
 ###############################################################################
 # Downloading reveal.js:
@@ -115,12 +117,35 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	pandoc -t revealjs $< -o $@
 
 .%.svg.htm: %.svg
-	@echo '<section class="svg-slide">' > $@                               \
-	 echo '  <object data="$<" onload="addSVGslide(this)"></object>' >> $@ \
-	 echo '  <script>' >> $@                                               \
-	 echo '      if (loading_selfanims == null)' >> $@                     \
-	 echo '          loading_selfanims = 1;' >> $@                         \
-	 echo '      else' >> $@                                               \
-	 echo '          loading_selfanims++;' >> $@                           \
-	 echo '  </script>' >> $@                                              \
-	 echo '</section>' >> $@
+	@echo '<section><!-- SVG slide -->' > $@;                              \
+	 echo -n '  <object style=' >> $@;                                     \
+	 echo -n '"width: 100%; height: 100%; object-fit: contain;" ' >> $@;   \
+	 echo 'data="$<" onload="addSVGslide(this)"></object>' >> $@;          \
+	 echo '  <script>' >> $@;                                              \
+	 echo '      if (loading_selfanims == null)' >> $@;                    \
+	 echo '          loading_selfanims = 1;' >> $@;                        \
+	 echo '      else' >> $@;                                              \
+	 echo '          loading_selfanims++;' >> $@;                          \
+	 echo '  </script>' >> $@;                                             \
+	 echo '</section>' >> $@;
+
+.%.pdf.htm: %.pdf
+	@echo '<section><!-- PDF slide -->' >> $@;                             \
+	 echo '  <div class="stretch" style="position: relative;">' >> $@;     \
+	 pgnum=1;                                                              \
+	 while pdftocairo -f $$pgnum -l $$pgnum -svg "$<" ".$<.$$pgnum.svg"    \
+	 > /dev/null; do                                                       \
+	     if [ "$$pgnum" == "1" ]; then                                     \
+	         echo -n '    <div style=' >> $@;                              \
+	     else                                                              \
+	         echo -n '    <div class="fragment" style=' >> $@;             \
+	     fi;                                                               \
+	     echo '"position: absolute; width: 100%; height: 100%;">' >> $@;   \
+	     echo -n '      <object style=' >> $@;                             \
+	     echo -n '"width: 100%; height: 100%; object-fit: contain;"' >> $@;\
+	     echo -e "data=\".$<.$$pgnum.svg\"></object>" >> $@;               \
+	     echo '    </div>' >> $@;                                          \
+	     pgnum=$$((pgnum+1));                                              \
+	 done;                                                                 \
+	 echo '  </div>' >> $@;                                                \
+	 echo '</section>' >> $@;
