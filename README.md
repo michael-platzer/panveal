@@ -21,6 +21,8 @@ and [reveal.js](https://revealjs.com/)
 
 * Each slide of your presentation must be stored in an individual file.
   All files which are covered by the wildcard pattern `slide_*`
+  and which have a filename extension corresponding to any
+  of the accepted input formats
   are part of your presentation.
 
 * The slides will be sorted in alphabetical order and should be numbered.

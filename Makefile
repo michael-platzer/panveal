@@ -33,7 +33,8 @@ REVEAL_THEME := theme/white.css
 REVEAL_FILES := $(PRES_DIR)/$(REVEAL_JS) $(PRES_DIR)/$(REVEAL_CSS)         \
                 $(PRES_DIR)/$(REVEAL_THEME)
 
-# All files covered by the wildcard pattern 'slide_*' are part of the
+# All files covered by the wildcard pattern 'slide_*' and which have a filename
+# extension corresponding to any of the accepted input formats are part of the
 # presentation:
 SLIDES := $(sort $(wildcard slide_*))
 SLIDES := $(filter %.htm %.html %.md %.svg %.pdf,$(SLIDES))
@@ -79,9 +80,12 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	 for next in $(SLIDES); do                                             \
 	     nextnum=$$(echo $$next | sed 's/\.\?slide_\([0-9]*\).*/\1/');     \
 	     if [ "$$act" != "" ]; then                                        \
+	         echo '' >> $@;                                                \
 	         if [ "$$nextnum" == "$$num" ]; then                           \
-	             echo '        <section>' >> $@;                           \
-	             level='1';                                                \
+	             if [ "$$level" != "1" ]; then                             \
+	                 echo '        <section>' >> $@;                       \
+	                 level='1';                                            \
+	             fi;                                                       \
 	             sed 's/^/          /' < $$act >> $@;                      \
 	         elif [ "$$level" == "1" ]; then                               \
 	             sed 's/^/          /' < $$act >> $@;                      \
@@ -90,25 +94,23 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	         else                                                          \
 	             sed 's/^/        /' < $$act >> $@;                        \
 	         fi;                                                           \
-	         echo $$act;                                                   \
 	     fi;                                                               \
 	     act=$$next;                                                       \
 	     num=$$nextnum;                                                    \
 	 done;                                                                 \
+	 echo '' >> $@;                                                        \
 	 if [ "$$act" == "" ]; then                                            \
 	     echo 'Your presentation contains no slides!';                     \
-	     exit 0;                                                           \
-	 fi;                                                                   \
-	 if [ "$$level" == "1" ]; then                                         \
+	 elif [ "$$level" == "1" ]; then                                       \
 	     sed 's/^/          /' < $$act >> $@;                              \
 	     echo '        </section>' >> $@;                                  \
 	 else                                                                  \
 	     sed 's/^/        /' < $$act >> $@;                                \
 	 fi;                                                                   \
-	 exit 0;
+	 echo '' >> $@;
 
-	 @sed -e '1,/.*<div class="slides">.*/d'                               \
-	      -e 's#\$$(REVEAL_JS)#$(REVEAL_JS)#' < $< >> $@
+	@sed -e '1,/.*<div class="slides">.*/d'                                \
+	     -e 's#\$$(REVEAL_JS)#$(REVEAL_JS)#' < $< >> $@
 
 ###############################################################################
 # Converting various formats to HTML:
@@ -132,18 +134,22 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 .%.pdf.htm: %.pdf
 	@echo '<section><!-- PDF slide -->' >> $@;                             \
 	 echo '  <div class="stretch" style="position: relative;">' >> $@;     \
-	 pgnum=1;                                                              \
-	 while pdftocairo -f $$pgnum -l $$pgnum -svg "$<" ".$<.$$pgnum.svg"    \
-	 > /dev/null; do                                                       \
+	 pgcnt=$$(pdfinfo "$<" | grep Pages | awk '{print $$2}');              \
+	 for pgnum in $$(seq 1 $$pgcnt); do                                    \
+	     pdftocairo -f $$pgnum -l $$pgnum -svg "$<" ".$<.$$pgnum.svg"      \
+	                                                         > /dev/null;  \
 	     if [ "$$pgnum" == "1" ]; then                                     \
-	         echo -n '    <div style=' >> $@;                              \
+	         echo -n '    <div ' >> $@;                                    \
+	     elif [ "$$pgnum" == "$$pgcnt" ]; then                             \
+	         echo -n '    <div class="fragment fade-in" ' >> $@;           \
 	     else                                                              \
-	         echo -n '    <div class="fragment" style=' >> $@;             \
+	         echo -n '    <div class="fragment current-visible" ' >> $@;   \
 	     fi;                                                               \
-	     echo '"position: absolute; width: 100%; height: 100%;">' >> $@;   \
+	     echo -n 'style="transition: none; position: absolute; ' >> $@;    \
+	     echo 'width: 100%; height: 100%;">' >> $@;                        \
 	     echo -n '      <object style=' >> $@;                             \
 	     echo -n '"width: 100%; height: 100%; object-fit: contain;"' >> $@;\
-	     echo -e "data=\".$<.$$pgnum.svg\"></object>" >> $@;               \
+	     echo -e " data=\".$<.$$pgnum.svg\"></object>" >> $@;              \
 	     echo '    </div>' >> $@;                                          \
 	     pgnum=$$((pgnum+1));                                              \
 	 done;                                                                 \
