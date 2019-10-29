@@ -122,10 +122,7 @@ As usual, raw HTML can be used within Markdown.
 Slides in the [SVG format](https://en.wikipedia.org/wiki/Scalable_Vector_Graphics)
 (with the extension `.svg`)
 are inserted into your presentation as a full-screen vector graphics image.
-Note that the content of the SVG file is not embedded into the presentation,
-but instead the SVG is referenced.
-Therefore, changes to the SVG will take effect in the presentation
-without a rebuild.
+The content of the SVG file is embedded as an inline SVG into the presentation.
 
 You can animate your SVG by creating multiple layers.
 Use a layer's name to specify in which animation steps it shall appear.

@@ -7,23 +7,26 @@
     <link rel="stylesheet" href="$(REVEAL_THEME)">
   </head>
   <body>
+
+    <div class="reveal">
+      <div class="slides" id="slides">
+      </div>
+    </div>
+
     <script>
         // list of slides which animate themselves (= self-anims):
         var selfanims = [];
 
-        // number of self-anims which are still loading (null if there are no
-        // self-anims, 0 if all of them have been loaded):
-        var loading_selfanims = null;
-    </script>
+        slides = document.getElementById("slides");
+        slide = slides.firstElementChild;
 
-    <div class="reveal">
-      <div class="slides">
-      </div>
-    </div>
+        while (slide != null) {
+            if (slide.classList.contains("svg-slide"))
+                addSVGslide(slide);
 
-    <script src="$(REVEAL_JS)"></script>
+            slide = slide.nextElementSibling
+        }
 
-    <script>
         /**
          * Initialize Reveal and set up a fragment event listeners.
          */
@@ -50,18 +53,14 @@
             });
         }
 
-        // if there are no self-anims, we immediatly initialize Reveal:
-        if (loading_selfanims == null)
-            initReveal();
-
         /**
          * Add an SVG slide to the self-anims.
          */
-        function addSVGslide(svg_obj) {
-            var slide = svg_obj.parentElement;
+        function addSVGslide(slide) {
+            var svg_obj = slide.firstElementChild;
 
             // get all groups (<g> tags) of the SVG file:
-            var groups = svg_obj.contentDocument.getElementsByTagName("g");
+            var groups = svg_obj.getElementsByTagName("g");
 
             // number of animation steps:
             var steps = 0;
@@ -119,27 +118,24 @@
                 elems_show: layers_show,
                 elems_hide: layers_hide,
                 next: function(idx) {
-                    var svg_obj = this.sect.getElementsByTagName("object")[0];
-                    var svg_dom = svg_obj.contentDocument;
+                    var svg_obj = this.sect.firstElementChild;
                     for (var i = 0; i < this.elems_show[idx].length; i++)
-                        svg_dom.getElementById(this.elems_show[idx][i]).style.display = "inline";
+                        svg_obj.getElementById(this.elems_show[idx][i]).style.display = "inline";
                     for (var i = 0; i < this.elems_hide[idx].length; i++)
-                        svg_dom.getElementById(this.elems_hide[idx][i]).style.display = "none";
+                        svg_obj.getElementById(this.elems_hide[idx][i]).style.display = "none";
                 },
                 prev: function(idx) {
-                    var svg_obj = this.sect.getElementsByTagName("object")[0];
-                    var svg_dom = svg_obj.contentDocument;
+                    var svg_obj = this.sect.firstElementChild;
                     for (var i = 0; i < this.elems_show[idx].length; i++)
-                        svg_dom.getElementById(this.elems_show[idx][i]).style.display = "none";
+                        svg_obj.getElementById(this.elems_show[idx][i]).style.display = "none";
                     for (var i = 0; i < this.elems_hide[idx].length; i++)
-                        svg_dom.getElementById(this.elems_hide[idx][i]).style.display = "inline";
+                        svg_obj.getElementById(this.elems_hide[idx][i]).style.display = "inline";
                 }
             });
-            loading_selfanims--;
-            if (loading_selfanims == 0)
-                initReveal();
         }
     </script>
+
+    <script src="$(REVEAL_JS)" onload="initReveal()"></script>
 
   </body>
 </html>

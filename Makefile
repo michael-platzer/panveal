@@ -69,7 +69,7 @@ $(PRES_DIR)/$(REVEAL_THEME):
 # Building the presentation file:
 
 $(PRES): $(TEMPLATE) $(SLIDES)
-	@sed -n '1,/.*<div class="slides">.*/p' < $< |                         \
+	@sed -n '1,/.*<div class="slides" id="slides">.*/p' < $< |             \
 	 sed -e 's/\$$(TITLE)/$(TITLE)/'                                       \
 	     -e 's#\$$(REVEAL_CSS)#$(REVEAL_CSS)#'                             \
 	     -e 's#\$$(REVEAL_THEME)#$(REVEAL_THEME)#' > $@
@@ -109,7 +109,7 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	 fi;                                                                   \
 	 echo '' >> $@;
 
-	@sed -e '1,/.*<div class="slides">.*/d'                                \
+	@sed -e '1,/.*<div class="slides" id="slides">.*/d'                    \
 	     -e 's#\$$(REVEAL_JS)#$(REVEAL_JS)#' < $< >> $@
 
 ###############################################################################
@@ -119,16 +119,8 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	pandoc -t revealjs $< -o $@
 
 .%.svg.htm: %.svg
-	@echo '<section><!-- SVG slide -->' > $@;                              \
-	 echo -n '  <object style=' >> $@;                                     \
-	 echo -n '"width: 100%; height: 100%; object-fit: contain;" ' >> $@;   \
-	 echo 'data="$<" onload="addSVGslide(this)"></object>' >> $@;          \
-	 echo '  <script>' >> $@;                                              \
-	 echo '      if (loading_selfanims == null)' >> $@;                    \
-	 echo '          loading_selfanims = 1;' >> $@;                        \
-	 echo '      else' >> $@;                                              \
-	 echo '          loading_selfanims++;' >> $@;                          \
-	 echo '  </script>' >> $@;                                             \
+	@echo '<section class="svg-slide"><!-- SVG slide -->' > $@;            \
+	 cat "$<" | sed '1d; s/^/  /' >> $@;                                   \
 	 echo '</section>' >> $@;
 
 .%.pdf.htm: %.pdf
