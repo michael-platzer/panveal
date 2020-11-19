@@ -20,9 +20,9 @@ PRES ?= pres.htm
 PRES_DIR := $(dir $(abspath $(PRES)))
 
 # Base URL for reveal.js files and sub-directories for *.js and *.css files:
-REVEAL_URL := https://github.com/hakimel/reveal.js/raw/master
-REVEAL_JS_DIR := js
-REVEAL_CSS_DIR := css
+REVEAL_URL := https://raw.githubusercontent.com/hakimel/reveal.js/ffadcc8502
+REVEAL_JS_DIR := dist
+REVEAL_CSS_DIR := dist
 
 # File for reveal.js (relative paths):
 REVEAL_JS := reveal.js
