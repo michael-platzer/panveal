@@ -18,7 +18,7 @@
         var selfanims = [];
 
         // add all SVG slides to selfanims
-        svg_slides = document.querySelectorAll("#slides .svg-slide");
+        var svg_slides = document.querySelectorAll("#slides .svg-slide");
         for (i = 0; i < svg_slides.length; i++) {
             addSVGslide(svg_slides[i]);
 
@@ -32,11 +32,80 @@
             }
         }
 
+
         /**
-         * Initialize Reveal and set up a fragment event listeners.
+         * Navigation functions (keeping track of vertical position in columns
+         * and of fragment indices for every slide.
+         */
+
+        var slide_col_y = []; // current vertical position for every column
+        var slide_frag = [];  //current frament index for every slide
+
+        function navigateSave() {
+            // save vertical position and fragment index of current slide:
+            var sld_idx = Reveal.getIndices();
+            slide_col_y[sld_idx.h] = sld_idx.v;
+            if (typeof slide_frag[sld_idx.h] === 'undefined') {
+                slide_frag[sld_idx.h] = [];
+            }
+            slide_frag[sld_idx.h][sld_idx.v] = sld_idx.f;
+        }
+
+        function navigateGoto(xpos, ypos) {
+            // first, save the current vertical position and fragment index:
+            navigateSave();
+
+            // then, go to the specified slide and set the fragment index:
+            if (typeof slide_frag[xpos]       === 'undefined' ||
+                typeof slide_frag[xpos][ypos] === 'undefined') {
+                Reveal.slide(xpos, ypos);
+            } else {
+                Reveal.slide(xpos, ypos, slide_frag[xpos][ypos]);
+            }
+        }
+
+        function navigateSideways(offset) {
+            var xpos = Reveal.getIndices().h + offset;
+            var ypos = 0;
+            if (typeof slide_col_y[xpos] !== 'undefined') {
+                ypos = slide_col_y[xpos];
+            }
+            navigateGoto(xpos, ypos);
+        }
+
+        function navigateVertically(offset) {
+            var sld_idx = Reveal.getIndices();
+            navigateGoto(sld_idx.h, sld_idx.v + offset);
+        }
+
+        function navigateFragment(offset) {
+            var sld_idx = Reveal.getIndices();
+            Reveal.slide(sld_idx.h, sld_idx.v, sld_idx.f + offset);
+        }
+
+
+        /**
+         * Initialize Reveal and set up fragment event listeners.
          */
         function initReveal() {
-            Reveal.initialize();
+            Reveal.initialize({
+                width: 1120, height: 640, slideNumber: 'c',
+                controls: false, progress: false, transition: 'none',
+                autoPlayMedia: true,
+                plugins: [ RevealNotes ],
+                keyboard: {
+                    33: () => { navigateFragment(-1);   }, // page-up key
+                    34: () => { navigateFragment( 1);   }, // page-down key
+                    38: () => { navigateVertically(-1); }, // up key
+                    40: () => { navigateVertically( 1); }, // down key
+                    37: () => { navigateSideways(-1);   }, // left key
+                    39: () => { navigateSideways( 1);   }  // right key
+                }
+            });
+
+            Reveal.on('slidechanged', event => {
+                navigateSave();
+            });
 
             Reveal.addEventListener("fragmentshown", function(event) {
                 var frag = event.fragment;
