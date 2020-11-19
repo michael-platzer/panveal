@@ -116,7 +116,9 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 # Converting various formats to HTML:
 
 .%.md.htm: %.md
-	pandoc -t revealjs $< -o $@
+	@echo '<section class="slide level1"><!-- Markdown slide -->' > $@;    \
+	 pandoc -t revealjs --slide-level=2 $< >> $@;                          \
+	 echo '</section>' >> $@;
 
 .%.svg.htm: %.svg
 	@echo '<section class="svg-slide"><!-- SVG slide -->' > $@;            \
