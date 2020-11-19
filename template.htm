@@ -17,14 +17,10 @@
         // list of slides which animate themselves (= self-anims):
         var selfanims = [];
 
-        slides = document.getElementById("slides");
-        slide = slides.firstElementChild;
-
-        while (slide != null) {
-            if (slide.classList.contains("svg-slide"))
-                addSVGslide(slide);
-
-            slide = slide.nextElementSibling
+        // add all SVG slides to selfanims
+        svg_slides = document.querySelectorAll("#slides .svg-slide");
+        for (i = 0; i < svg_slides.length; i++) {
+            addSVGslide(svg_slides[i]);
         }
 
         /**
@@ -92,11 +88,9 @@
 
                         if (off > 0)
                             layers_show[off - 1].push(groups[i].id);
-                        //if (0 <= end && end < max_idx)
                         if (0 <= end)
                             layers_hide[end].push(groups[i].id);
 
-                        // groups[i].style.display = (off > 0) ? "none" : "inline";
                         if (off == 0)
                             show_at_start = true;
                     }
