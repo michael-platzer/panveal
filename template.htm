@@ -21,6 +21,15 @@
         svg_slides = document.querySelectorAll("#slides .svg-slide");
         for (i = 0; i < svg_slides.length; i++) {
             addSVGslide(svg_slides[i]);
+
+            // convert description to speaker notes:
+            var meta_desc = svg_slides[i].querySelector("metadata dc\\:description");
+            if (meta_desc != null) {
+                node = document.createElement("aside");
+                node.className = "notes";
+                node.innerHTML = meta_desc.innerHTML.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                svg_slides[i].appendChild(node);
+            }
         }
 
         /**
@@ -129,6 +138,7 @@
         }
     </script>
 
+    <script src="plugin/notes/notes.js"></script>
     <script src="$(REVEAL_JS)" onload="initReveal()"></script>
 
   </body>

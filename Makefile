@@ -23,15 +23,19 @@ PRES_DIR := $(dir $(abspath $(PRES)))
 REVEAL_URL := https://raw.githubusercontent.com/hakimel/reveal.js/ffadcc8502
 REVEAL_JS_DIR := dist
 REVEAL_CSS_DIR := dist
+REVEAL_PLUGIN_DIR := plugin
 
-# File for reveal.js (relative paths):
+# Files for reveal.js (relative paths):
 REVEAL_JS := reveal.js
 REVEAL_CSS := reveal.css
 REVEAL_THEME := theme/white.css
+REVEAL_PLUGIN_NOTES := plugin/notes/plugin.js plugin/notes/notes.js           \
+                       plugin/notes/speaker-view.html
 
 # Absolute path of all files for reveal.js:
-REVEAL_FILES := $(PRES_DIR)/$(REVEAL_JS) $(PRES_DIR)/$(REVEAL_CSS)         \
-                $(PRES_DIR)/$(REVEAL_THEME)
+REVEAL_FILES := $(REVEAL_JS) $(REVEAL_CSS) $(REVEAL_THEME)                    \
+                $(REVEAL_PLUGIN_NOTES)
+REVEAL_FILES := $(addprefix $(PRES_DIR)/,$(REVEAL_FILES))
 
 # All files covered by the wildcard pattern 'slide_*' and which have a filename
 # extension corresponding to any of the accepted input formats are part of the
@@ -62,8 +66,12 @@ $(PRES_DIR)/$(REVEAL_CSS):
 	wget -nv -O $@ $(REVEAL_URL)/$(REVEAL_CSS_DIR)/$(REVEAL_CSS)
 
 $(PRES_DIR)/$(REVEAL_THEME):
-	mkdir theme
+	mkdir -p theme
 	wget -nv -O $@ $(REVEAL_URL)/$(REVEAL_CSS_DIR)/$(REVEAL_THEME)
+
+$(PRES_DIR)/plugin/%:
+	mkdir -p $(dir plugin/$*)
+	wget -nv -O $@ $(REVEAL_URL)/$(REVEAL_PLUGIN_DIR)/$*
 
 ###############################################################################
 # Building the presentation file:
