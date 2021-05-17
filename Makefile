@@ -17,6 +17,7 @@ TEMPLATE ?= $(MKFILE_DIR)/template.htm
 # Default presentation name and output path:
 TITLE ?= Panveal Presentation
 PRES ?= pres.htm
+PDF  := $(PRES:.htm=.pdf)
 PRES_DIR := $(dir $(abspath $(PRES)))
 
 # Base URL for reveal.js files and sub-directories for *.js and *.css files:
@@ -43,6 +44,9 @@ REVEAL_FILES := $(addprefix $(PRES_DIR)/,$(REVEAL_FILES))
 SLIDES := $(sort $(wildcard slide_*))
 SLIDES := $(filter %.htm %.html %.md %.svg %.pdf,$(SLIDES))
 
+# Convert *.svg files to temporary *.pdf files:
+SLIDES_PDF := $(SLIDES:%.svg=.%.svg.pdf)
+
 # Convert *.md, *.svg and *.pdf files to temporary *.htm files:
 SLIDES := $(SLIDES:%.md=.%.md.htm)
 SLIDES := $(SLIDES:%.svg=.%.svg.htm)
@@ -53,8 +57,10 @@ SLIDES := $(SLIDES:%.pdf=.%.pdf.htm)
 
 all: $(REVEAL_FILES) $(PRES)
 
+pdf: $(PDF)
+
 clean:
-	rm -f $(PRES) .*.htm .*.svg
+	rm -f $(PRES) $(PDF) .*.htm .*.svg .*.pdf
 
 ###############################################################################
 # Downloading reveal.js:
@@ -120,6 +126,9 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	@sed -e '1,/.*<div class="slides" id="slides">.*/d'                    \
 	     -e 's#\$$(REVEAL_JS)#$(REVEAL_JS)#' < $< >> $@
 
+$(PDF): $(SLIDES_PDF)
+	pdfunite $^ $@
+
 ###############################################################################
 # Converting various formats to HTML:
 
@@ -157,3 +166,6 @@ $(PRES): $(TEMPLATE) $(SLIDES)
 	 done;                                                                 \
 	 echo '  </div>' >> $@;                                                \
 	 echo '</section>' >> $@;
+
+.%.svg.pdf: %.svg
+	inkscape --export-area-page --export-margin=10 --export-filename=$@ $<
